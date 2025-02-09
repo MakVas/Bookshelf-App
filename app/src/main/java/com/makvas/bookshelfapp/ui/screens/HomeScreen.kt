@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,6 +26,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -32,6 +34,8 @@ import coil.request.ImageRequest
 import com.makvas.bookshelfapp.R
 import com.makvas.bookshelfapp.model.Book
 import com.makvas.bookshelfapp.model.BookList
+import com.makvas.bookshelfapp.model.ImageLinks
+import com.makvas.bookshelfapp.model.VolumeInfo
 import com.makvas.bookshelfapp.ui.theme.BookshelfAppTheme
 
 @Composable
@@ -118,6 +122,7 @@ fun SuccessScreen(
                 modifier = Modifier
                     .padding(dimensionResource(R.dimen.padding_small))
                     .fillMaxWidth()
+                    .height(350.dp)
             )
         }
     }
@@ -149,21 +154,31 @@ fun BookItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(250.dp)
             )
-            Text(
-                text = book.volumeInfo.title,
-                fontWeight = FontWeight.Bold,
+            Column(
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.padding_small))
-            )
-            Text(
-                text = book.volumeInfo.authors[0],
-                modifier = Modifier
-                    .padding(
-                        start = dimensionResource(R.dimen.padding_small),
-                        bottom = dimensionResource(R.dimen.padding_small)
-                    )
-            )
+                    .fillMaxSize()
+                    .padding(dimensionResource(R.dimen.padding_small)),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = book.volumeInfo.title,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                val authors = if (book.volumeInfo.authors.isNullOrEmpty())
+                    listOf(stringResource(R.string.unknown_author))
+                else book.volumeInfo.authors
+
+                Text(
+                    text = authors[0],
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -189,6 +204,22 @@ fun LoadingScreenPreview() {
 @Composable
 fun SuccessScreenPreview() {
     BookshelfAppTheme {
-        //SuccessScreen(booksList = mockData)
+        val mockData = BookList(
+            items = List(10) {
+                Book(
+                    id = "$it",
+                    volumeInfo = VolumeInfo(
+                        title = "Book $it",
+                        authors = listOf("Author"),
+                        imageLinks = ImageLinks(
+                            thumbnail = ""
+                        ),
+                        publisher = "",
+                        publishedDate = ""
+                    )
+                )
+            }
+        )
+        SuccessScreen(booksList = mockData)
     }
 }

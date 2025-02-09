@@ -4,4 +4,5 @@
     <string name="loading_failed">Loading failed</string>
     <string name="loading">Loading…</string>
     <string name="book_image">Book image</string>
+    <string name="unknown_author">Unknown author</string>
 </resources>

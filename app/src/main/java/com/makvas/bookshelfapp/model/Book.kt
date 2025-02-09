@@ -24,10 +24,10 @@ data class Book(
 @Serializable
 data class VolumeInfo(
     val title: String,
-    val authors: List<String>,
-    val publisher: String,
-    val publishedDate: String,
-    val imageLinks: ImageLinks?
+    val authors: List<String>? = emptyList(),
+    val publisher: String? = null,
+    val publishedDate: String? = null,
+    val imageLinks: ImageLinks? = null
 )
 
 @OptIn(ExperimentalSerializationApi::class)
