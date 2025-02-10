@@ -2,4 +2,10 @@
 <resources>
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_large">32dp</dimen>
+
+    <dimen name="card_corner_radius">16dp</dimen>
+    <dimen name="surface_corner_radius">32dp</dimen>
+    <dimen name="image_height">120dp</dimen>
+    <dimen name="image_width">80dp</dimen>
 </resources>
