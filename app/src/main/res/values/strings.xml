@@ -7,4 +7,8 @@
     <string name="unknown_author">Unknown author</string>
     <string name="search">Search</string>
     <string name="pages">"Pages: "</string>
+    <string name="welcome_text">Welcome to the Bookshelf App!</string>
+    <string name="to_start_text">
+        To start searching, tap the search symbol in the upper right corner
+    </string>
 </resources>

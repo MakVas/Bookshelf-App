@@ -75,7 +75,16 @@ fun BookshelfApp() {
             }
         }
     ) {
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize(),
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            shape = RoundedCornerShape(
+                topStart = dimensionResource(id = R.dimen.surface_corner_radius),
+                topEnd = dimensionResource(id = R.dimen.surface_corner_radius),
+            )
+        ) {
             Crossfade(
                 targetState = uiState.isStartScreen,
             ) { target ->
@@ -85,7 +94,7 @@ fun BookshelfApp() {
                     HomeScreen(
                         bookResponse = uiState.bookResponse,
                         retryAction = viewModel::getBooks,
-                        contentPadding = it
+                        //contentPadding = it
                     )
                 }
             }
