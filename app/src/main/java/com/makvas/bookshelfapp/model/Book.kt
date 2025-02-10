@@ -25,6 +25,8 @@ data class Book(
 data class VolumeInfo(
     val title: String,
     val authors: List<String>? = emptyList(),
+    val categories: List<String>? = emptyList(),
+    val pageCount: Int? = null,
     val publisher: String? = null,
     val publishedDate: String? = null,
     val imageLinks: ImageLinks? = null
