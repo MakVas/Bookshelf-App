@@ -1,5 +1,6 @@
 package com.makvas.bookshelfapp.ui.screens.home_screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -24,21 +25,33 @@ class HomeScreenViewModel(
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
 
-    fun updateCurrentBook(book: Book) {
-        _uiState.update {
-            it.copy(selectedBook = book, isBookDetails = true)
-        }
-    }
-
-    fun navigateToBookDetails() {
-        _uiState.update {
-            it.copy(isBookDetails = true)
-        }
-    }
-
     fun navigateToHomeScreen() {
         _uiState.update {
-            it.copy(isBookDetails = false)
+            it.copy(screenType = ScreenType.HOME)
+        }
+    }
+
+    fun navigateToDetailsScreen() {
+        _uiState.update {
+            it.copy(screenType = ScreenType.DETAILS)
+        }
+    }
+
+    fun topAppBarTypeDefault() {
+        _uiState.update {
+            it.copy(topAppBarType = TopAppBarType.DEFAULT)
+        }
+    }
+
+    fun topAppBarTypeSearch() {
+        _uiState.update {
+            it.copy(topAppBarType = TopAppBarType.SEARCH)
+        }
+    }
+
+    fun topAppBarTypeDetails() {
+        _uiState.update {
+            it.copy(topAppBarType = TopAppBarType.DETAILS)
         }
     }
 
@@ -48,34 +61,43 @@ class HomeScreenViewModel(
         }
     }
 
-    fun toggleSearch() {
-        _uiState.update {
-            it.copy(isSearch = !it.isSearch)
-        }
-    }
-
     fun getBooks() {
-        _uiState.update { it.copy(isStartScreen = false) }
         viewModelScope.launch {
-            _uiState.update { it.copy(bookResponse = BookResponse.Loading) }
-            _uiState.update {
-                try {
-                    it.copy(
-                        bookResponse = BookResponse.Success(
-                            booksRepository.getBooks(
-                                query = _uiState.value.searchQuery,
-                                maxResults = 10
-                            )
-                        )
-                    )
-                } catch (e: IOException) {
-                    it.copy(bookResponse = BookResponse.Error)
-                } catch (e: HttpException) {
-                    it.copy(bookResponse = BookResponse.Error)
-                }
+            _uiState.update { it.copy(bookListResponse = Response.Loading) }
+            try {
+                val books = booksRepository.getBooks(
+                    query = _uiState.value.searchQuery,
+                    maxResults = 10
+                )
+                _uiState.update { it.copy(bookListResponse = Response.Success(books)) }
+            } catch (e: IOException) {
+                _uiState.update { it.copy(bookListResponse = Response.Error) }
+            } catch (e: HttpException) {
+                _uiState.update { it.copy(bookListResponse = Response.Error) }
             }
         }
     }
+
+
+    fun getBook(book: Book) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(bookDetailsResponse = Response.Loading) }
+            try {
+                val bookResponse = booksRepository.getBook(
+                    bookID = book.id,
+                )
+                _uiState.update { it.copy(bookDetailsResponse = Response.Success(bookResponse)) }
+                Log.d("HomeScreenViewModel", "getBook: $bookResponse")
+            } catch (e: IOException) {
+                _uiState.update { it.copy(bookDetailsResponse = Response.Error) }
+                Log.d("HomeScreenViewModel", "getBook: $e")
+            } catch (e: HttpException) {
+                _uiState.update { it.copy(bookDetailsResponse = Response.Error) }
+                Log.d("HomeScreenViewModel", "getBook: $e")
+            }
+        }
+    }
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

@@ -33,25 +33,26 @@ import coil.request.ImageRequest
 import com.makvas.bookshelfapp.R
 import com.makvas.bookshelfapp.model.Book
 import com.makvas.bookshelfapp.model.BookList
-import com.makvas.bookshelfapp.model.ImageLinks
-import com.makvas.bookshelfapp.model.VolumeInfo
+import com.makvas.bookshelfapp.model.defaultBook
 import com.makvas.bookshelfapp.ui.theme.BookshelfAppTheme
 
 @Composable
 fun HomeScreen(
-    bookResponse: BookResponse,
+    bookResponse: Response,
+    onBookPressed: (Book) -> Unit,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (bookResponse) {
-        is BookResponse.Success -> SuccessScreen(
-            booksList = bookResponse.books,
+        is Response.Success<*> -> SuccessHomeScreen(
+            onBookPressed = onBookPressed,
+            booksList = bookResponse.data as BookList,
             modifier = modifier.fillMaxSize()
         )
 
-        BookResponse.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        Response.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
 
-        BookResponse.Error -> ErrorScreen(
+        Response.Error -> ErrorScreen(
             retryAction = retryAction,
             modifier = modifier.fillMaxSize()
         )
@@ -101,7 +102,8 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SuccessScreen(
+fun SuccessHomeScreen(
+    onBookPressed: (Book) -> Unit,
     booksList: BookList,
     modifier: Modifier = Modifier,
 ) {
@@ -113,7 +115,7 @@ fun SuccessScreen(
                 book = book,
                 modifier = modifier
                     .fillMaxWidth()
-                    .clickable { }
+                    .clickable { onBookPressed(book) }
                     .padding(top = dimensionResource(R.dimen.padding_medium))
             )
         }
@@ -238,21 +240,11 @@ fun LoadingScreenPreview() {
 fun SuccessScreenPreview() {
     BookshelfAppTheme {
         val mockData = BookList(
-            items = List(10) {
-                Book(
-                    id = "$it",
-                    volumeInfo = VolumeInfo(
-                        title = "Book $it",
-                        authors = listOf("Author"),
-                        categories = listOf("Category"),
-                        pageCount = 100,
-                        publisher = "Publisher",
-                        publishedDate = "2025",
-                        imageLinks = ImageLinks(thumbnail = "")
-                    )
-                )
-            }
+            items = List(10) { defaultBook }
         )
-        SuccessScreen(booksList = mockData)
+        SuccessHomeScreen(
+            booksList = mockData,
+            onBookPressed = {},
+        )
     }
 }

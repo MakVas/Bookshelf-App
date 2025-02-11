@@ -1,19 +1,27 @@
 package com.makvas.bookshelfapp.ui.screens.home_screen
 
-import com.makvas.bookshelfapp.model.Book
-import com.makvas.bookshelfapp.model.BookList
+sealed interface Response {
+    data class Success<T>(val data: T) : Response
+    data object Loading : Response
+    data object Error : Response
+}
 
-sealed interface BookResponse {
-    data class Success(val books: BookList) : BookResponse
-    data object Loading : BookResponse
-    data object Error : BookResponse
+enum class ScreenType {
+    START,
+    HOME,
+    DETAILS
+}
+
+enum class TopAppBarType {
+    DEFAULT,
+    SEARCH,
+    DETAILS
 }
 
 data class HomeScreenUiState(
-    val bookResponse: BookResponse = BookResponse.Loading,
+    val bookListResponse: Response = Response.Loading,
+    val bookDetailsResponse: Response = Response.Loading,
     val searchQuery: String = "",
-    val selectedBook: Book? = null,
-    val isStartScreen: Boolean = true,
-    val isSearch: Boolean = false,
-    val isBookDetails: Boolean = false
+    val screenType: ScreenType = ScreenType.START,
+    val topAppBarType: TopAppBarType = TopAppBarType.DEFAULT
 )

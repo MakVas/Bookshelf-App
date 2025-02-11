@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import com.makvas.bookshelfapp.R
+import com.makvas.bookshelfapp.ui.theme.BookshelfAppTheme
 
 @Composable
 fun StartScreen(
@@ -38,5 +40,13 @@ fun StartScreen(
             style = MaterialTheme.typography.bodyLarge
         )
 
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StartScreenPreview() {
+    BookshelfAppTheme {
+        StartScreen()
     }
 }

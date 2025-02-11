@@ -1,11 +1,12 @@
 package com.makvas.bookshelfapp.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,9 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,8 +33,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.makvas.bookshelfapp.R
+import com.makvas.bookshelfapp.model.Book
+import com.makvas.bookshelfapp.ui.screens.details_screen.DetailsScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.HomeScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.HomeScreenViewModel
+import com.makvas.bookshelfapp.ui.screens.home_screen.Response
+import com.makvas.bookshelfapp.ui.screens.home_screen.ScreenType
+import com.makvas.bookshelfapp.ui.screens.home_screen.TopAppBarType
 import com.makvas.bookshelfapp.ui.screens.start_screen.StartScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,115 +53,203 @@ fun BookshelfApp() {
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Crossfade(
-                targetState = uiState.isSearch,
-            ) { target ->
-                if (!target) {
-                    BookshelfTopAppBar(
-                        scrollBehavior = scrollBehavior,
-                        onClick = viewModel::toggleSearch,
-                    )
-                } else {
-                    SearchField(
-                        value = uiState.searchQuery,
-                        onValueChange = viewModel::updateSearchQuery,
-                        onClick = viewModel::toggleSearch,
-                        onSearch = viewModel::getBooks,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-                            .padding(
-                                end = dimensionResource(R.dimen.padding_medium),
-                                bottom = dimensionResource(R.dimen.padding_small),
-                            )
-                    )
-                }
-            }
+            BookshelfTopAppBar(
+                topAppBarType = uiState.topAppBarType,
+                searchQuery = uiState.searchQuery,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onSearchClick = viewModel::topAppBarTypeSearch,
+                onBackClick = {
+                    if (uiState.topAppBarType == TopAppBarType.DETAILS) {
+                        viewModel.navigateToHomeScreen()
+                        viewModel.topAppBarTypeSearch()
+                    } else {
+                        viewModel.topAppBarTypeDefault()
+                    }
+                },
+                onSearch = {
+                    viewModel.navigateToHomeScreen()
+                    viewModel.getBooks()
+                },
+                modifier = Modifier.statusBarsPadding()
+            )
         }
     ) {
-        Surface(
+        MainOrDetailsScreen(
+            bookDetails = uiState.bookDetailsResponse,
+            screenType = uiState.screenType,
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            shape = RoundedCornerShape(
-                topStart = dimensionResource(id = R.dimen.surface_corner_radius),
-                topEnd = dimensionResource(id = R.dimen.surface_corner_radius),
-            )
-        ) {
-            Crossfade(
-                targetState = uiState.isStartScreen,
-            ) { target ->
-                if (target)
-                    StartScreen()
-                else {
-                    HomeScreen(
-                        bookResponse = uiState.bookResponse,
-                        retryAction = viewModel::getBooks,
-                        //contentPadding = it
-                    )
-                }
+            onBookPressed = { book ->
+                viewModel.getBook(book)
+                viewModel.navigateToDetailsScreen()
+                viewModel.topAppBarTypeDetails()
+            },
+            bookResponse = uiState.bookListResponse,
+            retryAction = viewModel::getBooks,
+            retryActionDetails = {
+                viewModel.navigateToHomeScreen()
+                viewModel.topAppBarTypeSearch()
+            }
+        )
+    }
+}
+
+@Composable
+fun MainOrDetailsScreen(
+    bookDetails: Response,
+    screenType: ScreenType,
+    onBookPressed: (Book) -> Unit,
+    bookResponse: Response,
+    retryAction: () -> Unit,
+    retryActionDetails: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = RoundedCornerShape(
+            topStart = dimensionResource(id = R.dimen.surface_corner_radius),
+            topEnd = dimensionResource(id = R.dimen.surface_corner_radius),
+        )
+    ) {
+        when (screenType) {
+            ScreenType.DETAILS -> {
+                DetailsScreen(
+                    bookDetails = bookDetails,
+                    retryAction = retryActionDetails,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+
+            ScreenType.HOME -> {
+                HomeScreen(
+                    onBookPressed = onBookPressed,
+                    bookResponse = bookResponse,
+                    retryAction = retryAction,
+                )
+            }
+
+            else -> {
+                StartScreen()
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookshelfTopAppBar(
-    scrollBehavior: TopAppBarScrollBehavior,
-    onClick: () -> Unit,
+    topAppBarType: TopAppBarType,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onSearchClick: () -> Unit,
+    onBackClick: () -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TopAppBar(
-        scrollBehavior = scrollBehavior,
-        title = { Text(text = stringResource(R.string.app_name)) },
-        actions = {
-            IconButton(
-                onClick = onClick
-            ) {
-                Icon(Icons.Filled.Search, contentDescription = null)
+    Crossfade(
+        targetState = topAppBarType
+    ) { state ->
+        when (state) {
+            TopAppBarType.DEFAULT -> DefaultRow(onSearchClick = onSearchClick, modifier = modifier)
+
+            TopAppBarType.SEARCH -> {
+                SearchRow(
+                    onBackClick = onBackClick,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = onSearchQueryChange,
+                    onSearch = onSearch,
+                    modifier = modifier
+                )
             }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            scrolledContainerColor = MaterialTheme.colorScheme.surface,
-        ),
-        modifier = modifier
-    )
+
+            TopAppBarType.DETAILS -> DetailsRow(onBackClick = onBackClick, modifier = modifier)
+        }
+    }
 }
 
 @Composable
-fun SearchField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    onClick: () -> Unit,
+fun DefaultRow(
+    onSearchClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                top = dimensionResource(id = R.dimen.padding_topappbar_top),
+                start = dimensionResource(id = R.dimen.padding_medium),
+                end = dimensionResource(id = R.dimen.padding_small),
+                bottom = dimensionResource(id = R.dimen.padding_topappbar_bottom)
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleLarge
+        )
+        IconButton(onClick = onSearchClick) {
+            Icon(Icons.Filled.Search, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+fun SearchRow(
+    onBackClick: () -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                end = dimensionResource(id = R.dimen.padding_medium),
+                bottom = dimensionResource(id = R.dimen.padding_small)
+            ),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = onClick
-        ) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null
-            )
+        IconButton(onClick = onBackClick) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
         }
         OutlinedTextField(
+            value = searchQuery,
+            onValueChange = onSearchQueryChange,
             placeholder = { Text(text = stringResource(R.string.search)) },
-            value = value,
-            onValueChange = onValueChange,
-            shape = RoundedCornerShape(dimensionResource(R.dimen.surface_corner_radius)),
             singleLine = true,
+            shape = RoundedCornerShape(dimensionResource(id = R.dimen.surface_corner_radius)),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = { onSearch() }
-            ),
-            modifier = Modifier.fillMaxWidth()
+            keyboardActions = KeyboardActions(onSearch = { onSearch() }),
+            modifier = Modifier
+                .fillMaxWidth()
         )
     }
+}
 
+@Composable
+fun DetailsRow(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                top = dimensionResource(id = R.dimen.padding_topappbar_top),
+                bottom = dimensionResource(id = R.dimen.padding_topappbar_bottom),
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBackClick) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+        }
+        Text(
+            text = stringResource(R.string.book_details),
+            style = MaterialTheme.typography.titleLarge
+        )
+    }
 }
