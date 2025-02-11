@@ -11,4 +11,11 @@
     <string name="to_start_text">
         To start searching, tap the search symbol in the upper right corner
     </string>
+    <string name="book_details">Book details</string>
+    <string name="page_count">Pages</string>
+    <string name="language">Language</string>
+    <string name="published_date">Published date</string>
+    <string name="publisher">Publisher</string>
+    <string name="description">Description:</string>
+    <string name="category">Category:</string>
 </resources>
