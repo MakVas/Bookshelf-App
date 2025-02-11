@@ -26,7 +26,6 @@ data class VolumeInfo(
     val title: String,
     val authors: List<String>? = emptyList(),
     val categories: List<String>? = emptyList(),
-    val pageCount: Int? = null,
     val publisher: String? = null,
     val publishedDate: String? = null,
     val imageLinks: ImageLinks? = null
@@ -37,4 +36,27 @@ data class VolumeInfo(
 @Serializable
 data class ImageLinks(
     val thumbnail: String
+)
+
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
+@Serializable
+data class BookDetails(
+    val id: String,
+    val volumeInfo: DetailVolumeInfo
+)
+
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
+@Serializable
+data class DetailVolumeInfo(
+    val title: String,
+    val authors: List<String>? = emptyList(),
+    val categories: List<String>? = emptyList(),
+    val publisher: String? = null,
+    val publishedDate: String? = null,
+    val imageLinks: ImageLinks? = null,
+    val description: String? = null,
+    val language: String? = null,
+    val pageCount: Int? = null,
 )

@@ -1,5 +1,6 @@
 package com.makvas.bookshelfapp.data
 
+import com.makvas.bookshelfapp.model.BookDetails
 import com.makvas.bookshelfapp.model.BookList
 import com.makvas.bookshelfapp.network.BooksApiService
 
@@ -8,6 +9,10 @@ interface BooksRepository {
         query: String,
         maxResults: Int
     ): BookList
+
+    suspend fun getBook(
+        bookID: String
+    ): BookDetails
 }
 
 class BooksRepositoryImpl(
@@ -19,5 +24,11 @@ class BooksRepositoryImpl(
     ): BookList = booksApiService.getBooks(
         query = query,
         maxResults = maxResults
+    )
+
+    override suspend fun getBook(
+        bookID: String
+    ): BookDetails = booksApiService.getBook(
+        bookID = bookID
     )
 }
