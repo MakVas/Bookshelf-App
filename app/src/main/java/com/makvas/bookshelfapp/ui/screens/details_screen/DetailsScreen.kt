@@ -25,8 +25,8 @@ import coil.request.ImageRequest
 import com.makvas.bookshelfapp.R
 import com.makvas.bookshelfapp.model.BookDetails
 import com.makvas.bookshelfapp.model.FakeDataSource
-import com.makvas.bookshelfapp.ui.screens.home_screen.ErrorScreen
-import com.makvas.bookshelfapp.ui.screens.home_screen.LoadingScreen
+import com.makvas.bookshelfapp.ui.screens.aditional.ErrorScreen
+import com.makvas.bookshelfapp.ui.screens.aditional.LoadingScreen
 import com.makvas.bookshelfapp.ui.theme.BookshelfAppTheme
 import com.makvas.bookshelfapp.ui.utils.Response
 
@@ -59,7 +59,7 @@ fun DetailsScreen(
 }
 
 @Composable
-fun SuccessDetailsScreen(
+private fun SuccessDetailsScreen(
     bookDetails: BookDetails,
     modifier: Modifier = Modifier
 ) {
@@ -168,7 +168,7 @@ fun SuccessDetailsScreen(
 }
 
 @Composable
-fun DetailsRow(
+private fun DetailsRow(
     title: String,
     content: String,
 ) {
@@ -183,7 +183,7 @@ fun DetailsRow(
 
 @Preview(showBackground = true)
 @Composable
-fun SuccessDetailsScreenPreview() {
+private fun SuccessDetailsScreenPreview() {
     BookshelfAppTheme {
         SuccessDetailsScreen(
             bookDetails = FakeDataSource.bookDetails

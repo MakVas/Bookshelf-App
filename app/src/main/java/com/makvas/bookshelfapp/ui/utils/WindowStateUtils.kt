@@ -19,6 +19,6 @@ enum class TopAppBarType {
 }
 
 enum class ContentType {
-    LIST_ONLY,
-    LIST_AND_DETAIL
+    LIST,
+    GRID
 }

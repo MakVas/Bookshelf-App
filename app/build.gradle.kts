@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
+
     // Coil
     implementation(libs.coil.compose)
 
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3.window.size)
     implementation(libs.androidx.ui.text.google.fonts)
 
     // Testing

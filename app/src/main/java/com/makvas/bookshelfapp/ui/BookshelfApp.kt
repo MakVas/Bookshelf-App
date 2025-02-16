@@ -1,54 +1,53 @@
 package com.makvas.bookshelfapp.ui
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.makvas.bookshelfapp.R
 import com.makvas.bookshelfapp.model.Book
+import com.makvas.bookshelfapp.ui.screens.aditional.BookshelfTopAppBar
 import com.makvas.bookshelfapp.ui.screens.details_screen.DetailsScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.HomeScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.HomeScreenViewModel
 import com.makvas.bookshelfapp.ui.screens.start_screen.StartScreen
+import com.makvas.bookshelfapp.ui.utils.ContentType
 import com.makvas.bookshelfapp.ui.utils.Response
 import com.makvas.bookshelfapp.ui.utils.ScreenType
 import com.makvas.bookshelfapp.ui.utils.TopAppBarType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookshelfApp() {
+fun BookshelfApp(
+    windowSize: WindowWidthSizeClass,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val viewModel: HomeScreenViewModel = viewModel(factory = HomeScreenViewModel.Factory)
     val uiState by viewModel.uiState.collectAsState()
+
+    val contentType = when (windowSize) {
+        WindowWidthSizeClass.Compact ->
+            ContentType.LIST
+
+        WindowWidthSizeClass.Expanded, WindowWidthSizeClass.Medium ->
+            ContentType.GRID
+
+        else -> ContentType.LIST
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -74,7 +73,8 @@ fun BookshelfApp() {
             )
         }
     ) {
-        MainOrDetailsScreen(
+        HomeOrDetailsScreen(
+            contentType = contentType,
             bookDetails = uiState.bookDetailsResponse,
             screenType = uiState.screenType,
             modifier = Modifier
@@ -96,7 +96,8 @@ fun BookshelfApp() {
 }
 
 @Composable
-fun MainOrDetailsScreen(
+private fun HomeOrDetailsScreen(
+    contentType: ContentType,
     bookDetails: Response,
     screenType: ScreenType,
     onBookPressed: (Book) -> Unit,
@@ -124,6 +125,7 @@ fun MainOrDetailsScreen(
 
             ScreenType.HOME -> {
                 HomeScreen(
+                    contentType = contentType,
                     onBookPressed = onBookPressed,
                     bookResponse = bookResponse,
                     retryAction = retryAction,
@@ -134,122 +136,5 @@ fun MainOrDetailsScreen(
                 StartScreen()
             }
         }
-    }
-}
-
-@Composable
-fun BookshelfTopAppBar(
-    topAppBarType: TopAppBarType,
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onSearchClick: () -> Unit,
-    onBackClick: () -> Unit,
-    onSearch: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Crossfade(
-        targetState = topAppBarType
-    ) { state ->
-        when (state) {
-            TopAppBarType.DEFAULT -> DefaultRow(onSearchClick = onSearchClick, modifier = modifier)
-
-            TopAppBarType.SEARCH -> {
-                SearchRow(
-                    onBackClick = onBackClick,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = onSearchQueryChange,
-                    onSearch = onSearch,
-                    modifier = modifier
-                )
-            }
-
-            TopAppBarType.DETAILS -> DetailsRow(onBackClick = onBackClick, modifier = modifier)
-        }
-    }
-}
-
-@Composable
-fun DefaultRow(
-    onSearchClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                top = dimensionResource(id = R.dimen.padding_topappbar_top),
-                start = dimensionResource(id = R.dimen.padding_medium),
-                end = dimensionResource(id = R.dimen.padding_small),
-                bottom = dimensionResource(id = R.dimen.padding_topappbar_bottom)
-            ),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.titleLarge
-        )
-        IconButton(onClick = onSearchClick) {
-            Icon(Icons.Filled.Search, contentDescription = null)
-        }
-    }
-}
-
-@Composable
-fun SearchRow(
-    onBackClick: () -> Unit,
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onSearch: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                end = dimensionResource(id = R.dimen.padding_medium),
-                bottom = dimensionResource(id = R.dimen.padding_small)
-            ),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onBackClick) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-        }
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            placeholder = { Text(text = stringResource(R.string.search)) },
-            singleLine = true,
-            shape = RoundedCornerShape(dimensionResource(id = R.dimen.surface_corner_radius)),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { onSearch() }),
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-fun DetailsRow(
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                top = dimensionResource(id = R.dimen.padding_topappbar_top),
-                bottom = dimensionResource(id = R.dimen.padding_topappbar_bottom),
-            ),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onBackClick) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-        }
-        Text(
-            text = stringResource(R.string.book_details),
-            style = MaterialTheme.typography.titleLarge
-        )
     }
 }
