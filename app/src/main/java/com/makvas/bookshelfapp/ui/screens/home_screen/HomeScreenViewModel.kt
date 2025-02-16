@@ -1,6 +1,5 @@
 package com.makvas.bookshelfapp.ui.screens.home_screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -10,6 +9,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.makvas.bookshelfapp.BookshelfApplication
 import com.makvas.bookshelfapp.data.BooksRepository
 import com.makvas.bookshelfapp.model.Book
+import com.makvas.bookshelfapp.ui.utils.Response
+import com.makvas.bookshelfapp.ui.utils.ScreenType
+import com.makvas.bookshelfapp.ui.utils.TopAppBarType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -87,13 +89,10 @@ class HomeScreenViewModel(
                     bookID = book.id,
                 )
                 _uiState.update { it.copy(bookDetailsResponse = Response.Success(bookResponse)) }
-                Log.d("HomeScreenViewModel", "getBook: $bookResponse")
             } catch (e: IOException) {
                 _uiState.update { it.copy(bookDetailsResponse = Response.Error) }
-                Log.d("HomeScreenViewModel", "getBook: $e")
             } catch (e: HttpException) {
                 _uiState.update { it.copy(bookDetailsResponse = Response.Error) }
-                Log.d("HomeScreenViewModel", "getBook: $e")
             }
         }
     }

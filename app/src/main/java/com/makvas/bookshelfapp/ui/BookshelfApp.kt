@@ -37,10 +37,10 @@ import com.makvas.bookshelfapp.model.Book
 import com.makvas.bookshelfapp.ui.screens.details_screen.DetailsScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.HomeScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.HomeScreenViewModel
-import com.makvas.bookshelfapp.ui.screens.home_screen.Response
-import com.makvas.bookshelfapp.ui.screens.home_screen.ScreenType
-import com.makvas.bookshelfapp.ui.screens.home_screen.TopAppBarType
 import com.makvas.bookshelfapp.ui.screens.start_screen.StartScreen
+import com.makvas.bookshelfapp.ui.utils.Response
+import com.makvas.bookshelfapp.ui.utils.ScreenType
+import com.makvas.bookshelfapp.ui.utils.TopAppBarType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -33,8 +33,9 @@ import coil.request.ImageRequest
 import com.makvas.bookshelfapp.R
 import com.makvas.bookshelfapp.model.Book
 import com.makvas.bookshelfapp.model.BookList
-import com.makvas.bookshelfapp.model.defaultBook
+import com.makvas.bookshelfapp.model.FakeDataSource
 import com.makvas.bookshelfapp.ui.theme.BookshelfAppTheme
+import com.makvas.bookshelfapp.ui.utils.Response
 
 @Composable
 fun HomeScreen(
@@ -239,11 +240,8 @@ fun LoadingScreenPreview() {
 @Composable
 fun SuccessScreenPreview() {
     BookshelfAppTheme {
-        val mockData = BookList(
-            items = List(10) { defaultBook }
-        )
         SuccessHomeScreen(
-            booksList = mockData,
+            booksList = FakeDataSource.bookList,
             onBookPressed = {},
         )
     }

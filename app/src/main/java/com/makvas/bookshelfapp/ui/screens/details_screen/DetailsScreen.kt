@@ -24,11 +24,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.makvas.bookshelfapp.R
 import com.makvas.bookshelfapp.model.BookDetails
-import com.makvas.bookshelfapp.model.defaultBookDetails
+import com.makvas.bookshelfapp.model.FakeDataSource
 import com.makvas.bookshelfapp.ui.screens.home_screen.ErrorScreen
 import com.makvas.bookshelfapp.ui.screens.home_screen.LoadingScreen
-import com.makvas.bookshelfapp.ui.screens.home_screen.Response
 import com.makvas.bookshelfapp.ui.theme.BookshelfAppTheme
+import com.makvas.bookshelfapp.ui.utils.Response
 
 @Composable
 fun DetailsScreen(
@@ -186,7 +186,7 @@ fun DetailsRow(
 fun SuccessDetailsScreenPreview() {
     BookshelfAppTheme {
         SuccessDetailsScreen(
-            bookDetails = defaultBookDetails
+            bookDetails = FakeDataSource.bookDetails
         )
     }
 }
